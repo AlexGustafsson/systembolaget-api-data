@@ -1,27 +1,24 @@
 systembolaget-api-data  - up to date git source of [Systembolaget's open APIs](https://www.systembolaget.se/api/) available in XML and JSON
 ======
 
-The repository is automatically updated with changes by a bot running the cross-platform utility [systembolaget-api-fetch](https://github.com/AlexGustafsson/systembolaget-api-fetch).
+The repository is automatically updated with changes by a bot running the cross-platform utility [systembolaget-api](https://github.com/AlexGustafsson/systembolaget-api).
 
 # Quickstart
 <a name="quickstart"></a>
 
-#### Using systembolaget-api-fetch
+## Running the bot
 
-Start by grabbing cloning the repository or download the repository as a zip file.
+The bot, available in `bot.sh`, is a simple shell script utilizing the [systembolaget-api](https://github.com/AlexGustafsson/systembolaget-api) utility.
 
+The script features several commands, but they all add up to the `run` command, usable like so:
+
+```shell
+./bot.sh --repository https://github.com/user/repository --ssh-key ./bot_ed25519 run
 ```
-> tree ./systembolaget-api-fetch
-output
-├── json
-│   ├── assortment.json
-│   ├── inventory.json
-│   └── stores.json
-└── xml
-    ├── assortment.xml
-    ├── inventory.xml
-    └── stores.xml
-```
+
+The SSH key can be generated using `ssh-keygen -o -a 100 -t ed25519 -f bot_ed25519` and should be added as a [Deploy Key](https://developer.github.com/v3/guides/managing-deploy-keys/) to the repository. Make sure the key has `push` privileges.
+
+For advanced usage, refer to the source code and the `help` command: `./bot.sh help`.
 
 # Table of contents
 
@@ -38,11 +35,11 @@ The utility can be used to automatically grab the latest available data in XML o
 # Contributing
 <a name="contributing"></a>
 
-Any help with the project is more than welcome. Check either [systembolaget-api-fetch](https://github.com/AlexGustafsson/systembolaget-api-fetch) for code related to the download and translation utility that manages the data, or [systembolaget-api-bot](https://github.com/AlexGustafsson/systembolaget-api-bot) for the utility that automatically updates this repository.
+Any help with the project is more than welcome. Although this is largely a mirror of Systembolaget's data, any corrections to it or the bot is welcome.
 
 # Disclaimer
 <a name="disclaimer"></a>
 
-_Although the project is very capable, it is not built with production in mind. Therefore there might be complications when trying to use systembolaget-api-data for large-scale projects meant for the public. The utility was created to easily integrate Systembolaget's open APIs on several platforms and as such it might not promote best practices nor be performant._
+_Although the project is very capable, it is not built with production in mind. Therefore there might be complications when trying to use systembolaget-api-data for large-scale projects meant for the public. The utility was created to easily interact with Systembolaget's open APIs on several platforms and as such it might not promote best practices nor be performant._
 
 _The author nor the utility is in any way affiliated with Systembolaget._
