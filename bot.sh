@@ -113,7 +113,7 @@ function run {
   fi
 
   # Check if this is the first time running the bot
-  if [ ! -e "$binary_name" ]; then
+  if [ ! -e "$binary_name" ] || [ ! -d "./repository" ]; then
     log_info "First time running, will now run setup"
     setup
   fi
@@ -137,19 +137,23 @@ function run {
   log_info "Executing $binary_name"
   # Use verbose logging if in debug mode
   if [[ "$log_level" -eq 3 ]]; then
+    # Download
     "./$binary_name" --verbose download assortment --pretty --format=xml --output="./repository/xml/assortment.xml"
     "./$binary_name" --verbose download inventory --pretty --format=xml --output="./repository/xml/inventory.xml"
     "./$binary_name" --verbose download stores --pretty --format=xml --output="./repository/xml/stores.xml"
-    "./$binary_name" --verbose download assortment --pretty --format=json --output="./repository/json/assortment.json"
-    "./$binary_name" --verbose download inventory --pretty --format=json --output="./repository/json/inventory.json"
-    "./$binary_name" --verbose download stores --pretty --format=json --output="./repository/json/stores.json"
+    # Convert
+    "./$binary_name" --verbose convert assortment --pretty --input="./repository/xml/assortment.xml" --input-format=xml --output="./repository/json/assortment.json" --output-format=json
+    "./$binary_name" --verbose convert assortment --pretty --input="./repository/xml/inventory.xml" --input-format=xml --output="./repository/json/inventory.json" --output-format=json
+    "./$binary_name" --verbose convert assortment --pretty --input="./repository/xml/stores.xml" --input-format=xml --output="./repository/json/stores.json" --output-format=json
   else
+    # Download
     "./$binary_name" download assortment --pretty --format=xml --output="./repository/xml/assortment.xml"
     "./$binary_name" download inventory --pretty --format=xml --output="./repository/xml/inventory.xml"
     "./$binary_name" download stores --pretty --format=xml --output="./repository/xml/stores.xml"
-    "./$binary_name" download assortment --pretty --format=json --output="./repository/json/assortment.json"
-    "./$binary_name" download inventory --pretty --format=json --output="./repository/json/inventory.json"
-    "./$binary_name" download stores --pretty --format=json --output="./repository/json/stores.json"
+    # Convert
+    "./$binary_name" convert assortment --pretty --input="./repository/xml/assortment.xml" --input-format=xml --output="./repository/json/assortment.json" --output-format=json
+    "./$binary_name" convert assortment --pretty --input="./repository/xml/inventory.xml" --input-format=xml --output="./repository/json/inventory.json" --output-format=json
+    "./$binary_name" convert assortment --pretty --input="./repository/xml/stores.xml" --input-format=xml --output="./repository/json/stores.json" --output-format=json
   fi
   log_debug "Download done"
 
@@ -171,7 +175,7 @@ function run {
 
   # Push
   log_debug "Pushing to remote repository"
-  (cd "./repository" && git push)
+  #(cd "./repository" && git push)
 
   # TODO: sort output from systembolaget-api for easy diffing?
   # Note: does not handle deep diffing of either JSON or XML, meaning
