@@ -175,7 +175,7 @@ function run {
 
   # Push
   log_debug "Pushing to remote repository"
-  #(cd "./repository" && git push)
+  (cd "./repository" && git push)
 
   # TODO: sort output from systembolaget-api for easy diffing?
   # Note: does not handle deep diffing of either JSON or XML, meaning
