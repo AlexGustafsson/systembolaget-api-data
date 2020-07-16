@@ -1,0 +1,8 @@
+# Ignore macOS .DS_Store files
+.DS_Store
+
+# Ignore the repository created by the bot
+/repository
+
+# Ignore the binary created by the bot
+/systembolaget
