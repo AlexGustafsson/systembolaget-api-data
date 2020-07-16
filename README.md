@@ -13,7 +13,7 @@ The bot, available in `bot.sh`, is a simple shell script utilizing the [systembo
 The script features several commands, but they all add up to the `run` command, usable like so:
 
 ```shell
-./bot.sh --repository https://github.com/user/repository --ssh-key ./bot_ed25519 run
+./bot.sh --repository https://github.com/user/repository --ssh-key "$(PWD)/bot_ed25519" run
 ```
 
 The SSH key can be generated using `ssh-keygen -o -a 100 -t ed25519 -f bot_ed25519` and should be added as a [Deploy Key](https://developer.github.com/v3/guides/managing-deploy-keys/) to the repository. Make sure the key has `push` privileges.
