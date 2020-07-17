@@ -42,9 +42,82 @@ Note that the user `bot` within the container will have to have read access to t
 # Table of contents
 
 [Quickstart](#quickstart)<br/>
+[Examples](#examples)<br/>
 [Use cases](#usecases)<br/>
 [Contributing](#contributing)<br/>
 [Disclaimer](#disclaimer)
+
+# Examples
+<a name="examples"></a>
+
+Example of an assortment item from `json/assortment.json`:
+
+```json
+{
+  "id": "8936603",
+  "itemId": "1000155",
+  "itemNumber": "89366",
+  "name": "Midas Golden Pilsner",
+  "name2": "",
+  "price": 26.7,
+  "volume": 330,
+  "pricePerLiter": 80.91,
+  "salesStart": "2015-09-01",
+  "discontinued": false,
+  "group": "Öl",
+  "type": "Ljus lager",
+  "style": "Pilsner - tjeckisk stil",
+  "packaging": "Flaska",
+  "seal": "",
+  "origin": "Hallands län",
+  "countryOfOrigin": "Sverige",
+  "producer": "Imperiebryggeriet",
+  "supplier": "Imperiebryggeriet  AB",
+  "vintage": "",
+  "testedVintage": "",
+  "alcoholByVolume": "4.90%",
+  "assortment": "BS",
+  "assortmentText": "Ordervaror",
+  "organic": false,
+  "ethical": false,
+  "kosher": false,
+  "ingredientDescription": ""
+}
+```
+
+Example of a store item from `xml/stores.xml`:
+
+```xml
+<Store>
+  <Type>Butik</Type>
+  <ID>0106</ID>
+  <Name>Garnisonen</Name>
+  <Address1>Karlavägen 100 A</Address1>
+  <Address2></Address2>
+  <Address3>115 26</Address3>
+  <Address4>STOCKHOLM</Address4>
+  <Address5>Stockholms län</Address5>
+  <PhoneNumber>08/662 64 85</PhoneNumber>
+  <StoreType></StoreType>
+  <Services></Services>
+  <Keywords>STOCKHOLM;STHLM;ÖSTERMALM</Keywords>
+  <OpeningHours>2020-07-17;10:00;19:00;;;0;_*2020-07-18;10:00;15:00;;;0;_*2020-07-19;00:00;00:00;;;-;_*2020-07-20;10:00;19:00;;;0;_*2020-07-21;10:00;19:00;;;0;_*2020-07-22;10:00;19:00;;;0;_*2020-07-23;10:00;19:00;;;0;_*2020-07-24;10:00;19:00;;;0;_*2020-07-25;10:00;15:00;;;0;_*2020-07-26;00:00;00:00;;;-;_*2020-07-27;10:00;19:00;;;0;_*2020-07-28;10:00;19:00;;;0;_*2020-07-29;10:00;19:00;;;0;_*2020-07-30;10:00;19:00;;;0;_*2020-07-31;10:00;19:00;;;0;_*2020-08-01;10:00;15:00;;;0;</OpeningHours>
+  <RT90x>6581720</RT90x>
+  <RT90y>1630377</RT90y>
+</Store>
+```
+
+Example of a inventory item from `json/inventory.json`:
+
+```json
+{
+  "id": "0102",
+  "itemNumbers": [
+    302,
+    701
+  ]
+}
+```
 
 # Use cases
 <a name="usecases"></a>
