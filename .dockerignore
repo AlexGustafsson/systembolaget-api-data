@@ -1,0 +1,6 @@
+# Ignore everything
+*
+
+# Whitelist necessary files
+!/bot.sh
+!/entrypoint.sh

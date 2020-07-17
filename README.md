@@ -20,6 +20,25 @@ The SSH key can be generated using `ssh-keygen -o -a 100 -t ed25519 -f bot_ed255
 
 For advanced usage, refer to the source code and the `help` command: `./bot.sh help`.
 
+The bot can also be run using Docker. First you'll need to build the image:
+
+```
+docker build -t axgn/systembolaget-api-bot .
+```
+
+You can then invoke it like so:
+
+```shell
+docker run -it \
+  --mount type=bind,source="$(pwd)"/bot_ed25519,target=/etc/bot/bot_ed25519,readonly \
+  --mount type=bind,source="$(pwd)"/bot_ed25519.pub,target=/etc/bot/bot_ed25519.pub,readonly \
+  axgn/systembolaget-api-bot "0 7 * * *" run --ssh-key /etc/bot/bot_ed25519 --log debug
+```
+
+The command for the container is identical to that of the `bot.sh` script - apart from the first parameter which is the (required) cron syntax - such as `0 7 * * *`. The default command is `"0 7 * * *" run --log debug --ssh-key /etc/bot/bot_ed25519`.
+
+Note that the user `bot` within the container will have to have read access to the mounted key files.
+
 # Table of contents
 
 [Quickstart](#quickstart)<br/>

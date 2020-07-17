@@ -7,16 +7,16 @@ binary_repository="https://github.com/AlexGustafsson/systembolaget-api"
 # Note: git URL allows for using SSH deploy keys
 repository="git@github.com:AlexGustafsson/systembolaget-api-data.git"
 binary_name="systembolaget"
-# 0: error, 1: warn, 2: log, 3: debug
+# 0: error, 1: warn, 2: info, 3: debug
 log_level=2
 bot_name="Systembolaget API Bot"
 commit_message="Update API data"
 ssh_key="$SYSTEMBOLAGET_API_BOT_SSH_KEY"
 
 function log {
-  echo -ne "[$(date +"%b %d %H:%M:%S")] [$1] "
+  echo -ne "[$(date +"%b %d %H:%M:%S")] [$1] " >&2
   shift
-  echo "$@"
+  echo "$@" >&2
 }
 
 function log_error {
@@ -44,6 +44,7 @@ function log_debug {
 }
 
 function git {
+  log_debug "Executing git command: GIT_SSH_COMMAND=\"ssh -i $ssh_key\" command git $*"
   GIT_SSH_COMMAND="ssh -i $ssh_key" command git "$@"
 }
 
@@ -94,7 +95,7 @@ function setup {
 
   # Clone the repository to push to
   log_debug "Cloning repository"
-  git_output="$(git clone --quiet "$repository" repository 2>&1)"
+  git clone "$repository" repository
   if [[ ! $? -eq 0 ]]; then
     log_error "Unable to clone repository: $git_output"
     exit 1
@@ -160,24 +161,23 @@ function run {
   # Add all new items and commit as $bot_name
   log_debug "Commiting to repository as $bot_name"
   (cd "./repository" && git add .)
-  git_output="$(cd "./repository" && GIT_COMMITTER_NAME="$bot_name" GIT_COMMITTER_EMAIL="" git commit --author="$bot_name <>" -m "$commit_message" 2>&1)"
-
+  (cd "./repository" && GIT_COMMITTER_NAME="$bot_name" GIT_COMMITTER_EMAIL="" git commit --author="$bot_name <>" -m "$commit_message" 2>&1)
   if [[ "$?" -eq 0 ]]; then
     log_info "Commited to repository"
+
+    # Push
+    log_debug "Pushing to remote repository"
+    (cd "./repository" && git push)
   else
     if [[ "$(cd "./repository" && git status --short)" == "" ]]; then
       log_info "Nothing to commit - already up to date"
     else
-      log_error "Failed to commit to repository: $git_output"
+      (cd "./repository" && git status)
+      log_error "Failed to commit to repository"
       exit 1
     fi
   fi
 
-  # Push
-  log_debug "Pushing to remote repository"
-  (cd "./repository" && git push)
-
-  # TODO: sort output from systembolaget-api for easy diffing?
   # Note: does not handle deep diffing of either JSON or XML, meaning
   #  that the file will be replaced each time and not properly updated
   #  with only the changes
@@ -239,7 +239,7 @@ while [ "$1" != "" ]; do
         "warn")
           log_level=1
           ;;
-        "log")
+        "info")
           log_level=2
           ;;
         "debug")
