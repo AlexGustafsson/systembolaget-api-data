@@ -1,6 +1,8 @@
 systembolaget-api-data  - up to date git source of [Systembolaget's open APIs](https://www.systembolaget.se/api/) available in XML and JSON
 ======
 
+> Note: since 2020-11-01 Systembolaget has withdrawn access to their APIs due to parties abusing it (for financial gain or targeting minors). The data is therefore no longer up to date. If the situation changes, this repository will be live again. If you'd like to contribute and help solve the issue, you're more than welcome to join in over at https://github.com/AlexGustafsson/systembolaget-api.
+
 The repository is automatically updated with changes by a bot running the cross-platform utility [systembolaget-api](https://github.com/AlexGustafsson/systembolaget-api).
 
 # Quickstart
