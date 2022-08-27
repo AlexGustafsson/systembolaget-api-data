@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 ##
 # Configuration
 # Note: no trailing '/'
@@ -65,37 +67,54 @@ function setup {
   # Download the latest binary available
   case $(uname) in
     "Darwin")
-      log_debug "Downloading Darwin build"
-      curl -sOL "$binary_repository/releases/download/$latest_tag/darwin_amd64.tar.gz"
-      log_debug "Downloaded build, unzipping"
-      tar -xzf darwin_amd64.tar.gz
-      log_debug "Unzipped build, removing archive"
-      rm darwin_amd64.tar.gz
+      case $(uname -a) in
+      *"x86_64"*)
+        log_debug "Downloading Darwin x86_64 build"
+        curl -sOL "$binary_repository/releases/download/$latest_tag/darwin_amd64.tgz"
+        log_debug "Downloaded build, unzipping"
+        tar -xf darwin_amd64.tgz
+        log_debug "Unzipped build, removing archive"
+        mv build/darwin_amd64 systembolaget
+        rm -r build darwin_amd64.tgz
+        ;;
+      *"arm"*)
+        log_debug "Downloading Darwin arm build"
+        curl -sOL "$binary_repository/releases/download/$latest_tag/darwin_arm.tgz"
+        log_debug "Downloaded build, unzipping"
+        tar -xf darwin_arm64.tgz
+        log_debug "Unzipped build, removing archive"
+        mv build/darwin_arm64 systembolaget
+        rm -r build darwin_arm64.tgz
+        ;;
+      esac
       ;;
     "Linux")
       case $(uname -a) in
       *"x86_64"*)
         log_debug "Downloading Linux x86_64 build"
-        curl -sOL "$binary_repository/releases/download/$latest_tag/linux_amd64.tar.gz"
+        curl -sOL "$binary_repository/releases/download/$latest_tag/linux_amd64.tgz"
         log_debug "Downloaded build, unzipping"
-        tar -xf linux_amd64.tar.gz
+        tar -xf linux_amd64.tgz
         log_debug "Unzipped build, removing archive"
-        rm linux_amd64.tar.gz
+        mv build/linux_amd64 systembolaget
+        rm -r build linux_amd64.tgz
         ;;
       *"arm"*)
         log_debug "Downloading Linux arm build"
-        curl -sOL "$binary_repository/releases/download/$latest_tag/linux_arm.tar.gz"
+        curl -sOL "$binary_repository/releases/download/$latest_tag/linux_arm.tgz"
         log_debug "Downloaded build, unzipping"
-        tar -xf linux_arm.tar.gz
+        tar -xf linux_arm64.tgz
         log_debug "Unzipped build, removing archive"
-        rm linux_arm.tar.gz
+        mv build/linux_arm64 systembolaget
+        rm -r build linux_arm64.tgz
         ;;
       esac
+      ;;
   esac
 
   # Clone the repository to push to
   log_debug "Cloning repository"
-  git clone "$repository" repository
+  git clone --depth=1 "$repository" repository
   if [[ ! $? -eq 0 ]]; then
     log_error "Unable to clone repository: $git_output"
     exit 1
@@ -121,7 +140,7 @@ function run {
 
   # Update repository, forcing it to be equal to the remote
   log_debug "Updating repository"
-  git_output="$(cd repository && git fetch && git reset --hard origin/master 2>&1)"
+  git_output="$(cd repository && git fetch && git reset --hard origin/main 2>&1)"
   if [[ $? -eq 0 ]]; then
     log_debug "$git_output"
   else
@@ -131,31 +150,13 @@ function run {
 
   # Ensure target directories exist
   log_debug "Creating target directories"
-  mkdir -p repository/xml
-  mkdir -p repository/json
+  mkdir -p repository/data
 
   # Run binary
   log_info "Executing $binary_name"
-  # Use verbose logging if in debug mode
-  if [[ "$log_level" -eq 3 ]]; then
-    # Download
-    "./$binary_name" --verbose download assortment --pretty --format=xml --output="./repository/xml/assortment.xml"
-    "./$binary_name" --verbose download inventory --pretty --format=xml --output="./repository/xml/inventory.xml"
-    "./$binary_name" --verbose download stores --pretty --format=xml --output="./repository/xml/stores.xml"
-    # Convert
-    "./$binary_name" --verbose convert assortment --pretty --input="./repository/xml/assortment.xml" --input-format=xml --output="./repository/json/assortment.json" --output-format=json
-    "./$binary_name" --verbose convert assortment --pretty --input="./repository/xml/inventory.xml" --input-format=xml --output="./repository/json/inventory.json" --output-format=json
-    "./$binary_name" --verbose convert assortment --pretty --input="./repository/xml/stores.xml" --input-format=xml --output="./repository/json/stores.json" --output-format=json
-  else
-    # Download
-    "./$binary_name" download assortment --pretty --format=xml --output="./repository/xml/assortment.xml"
-    "./$binary_name" download inventory --pretty --format=xml --output="./repository/xml/inventory.xml"
-    "./$binary_name" download stores --pretty --format=xml --output="./repository/xml/stores.xml"
-    # Convert
-    "./$binary_name" convert assortment --pretty --input="./repository/xml/assortment.xml" --input-format=xml --output="./repository/json/assortment.json" --output-format=json
-    "./$binary_name" convert assortment --pretty --input="./repository/xml/inventory.xml" --input-format=xml --output="./repository/json/inventory.json" --output-format=json
-    "./$binary_name" convert assortment --pretty --input="./repository/xml/stores.xml" --input-format=xml --output="./repository/json/stores.json" --output-format=json
-  fi
+  # Download
+  "./$binary_name" assortment --page-delay 2s > repository/data/assortment.json
+  "./$binary_name" stores > repository/data/stores.json
   log_debug "Download done"
 
   # Add all new items and commit as $bot_name
@@ -178,9 +179,8 @@ function run {
     fi
   fi
 
-  # Note: does not handle deep diffing of either JSON or XML, meaning
-  #  that the file will be replaced each time and not properly updated
-  #  with only the changes
+  # Note: does not handle deep diffing of JSON, meaning that the file will be
+  # replaced each time and not properly updated with only the changes
 }
 
 # Print the help text
