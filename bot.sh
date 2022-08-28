@@ -155,8 +155,8 @@ function run {
   # Run binary
   log_info "Executing $binary_name"
   # Download
-  "./$binary_name" assortment --page-delay 2s > repository/data/assortment.json
-  "./$binary_name" stores > repository/data/stores.json
+  "./$binary_name" --verbose assortment --page-delay 2s --output repository/data/assortment.json
+  "./$binary_name" --verbose stores --output repository/data/stores.json
   log_debug "Download done"
 
   # Add all new items and commit as $bot_name
