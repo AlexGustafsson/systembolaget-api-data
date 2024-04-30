@@ -257,7 +257,7 @@ Example of a store item from `data/stores.json`:
 ## Use cases
 <a name="usecases"></a>
 
-The utility can be used to automatically grab the latest available data from Systembolagt. The data can be used to create
+The utility can be used to automatically grab the latest available data from Systembolaget. The data can be used to create
 interesting statistical charts, archives and more. Note however that data derived from the platform should not be used
 in a way that goes against [Systembolaget's mission](https://www.omsystembolaget.se/english/systembolaget-explained/).
 
