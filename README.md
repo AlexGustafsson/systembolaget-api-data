@@ -1,10 +1,8 @@
-systembolaget-api-data  - up to date git source of Systembolaget's assortment
-======
+# systembolaget-api-data  - up to date git source of Systembolaget's assortment
 
 The repository is automatically updated with changes by a bot running the cross-platform utility [systembolaget-api](https://github.com/AlexGustafsson/systembolaget-api).
 
 ## Quickstart
-<a name="quickstart"></a>
 
 ### Running the bot
 
@@ -13,7 +11,7 @@ The bot, available in `bot.sh`, is a simple shell script utilizing the [systembo
 The script features several commands, but they all add up to the `run` command, usable like so:
 
 ```shell
-./bot.sh --repository https://github.com/user/repository --ssh-key "$(PWD)/bot_ed25519" run
+./bot.sh --repository https://github.com/user/repository --ssh-key "$PWD/bot_ed25519" run
 ```
 
 The SSH key can be generated using `ssh-keygen -o -a 100 -t ed25519 -f bot_ed25519` and should be added as a [Deploy Key](https://developer.github.com/v3/guides/managing-deploy-keys/) to the repository. Make sure the key has `push` privileges.
@@ -22,7 +20,7 @@ For advanced usage, refer to the source code and the `help` command: `./bot.sh h
 
 The bot can also be run using Docker. First you'll need to build the image:
 
-```
+```shell
 docker build -t axgn/systembolaget-api-bot .
 ```
 
@@ -30,8 +28,8 @@ You can then invoke it like so:
 
 ```shell
 docker run -it \
-  --mount type=bind,source="/home/alexgustafsson/"bot_ed25519,target=/etc/bot/bot_ed25519,readonly \
-  --mount type=bind,source="/home/alexgustafsson/"bot_ed25519.pub,target=/etc/bot/bot_ed25519.pub,readonly \
+  --mount type=bind,source="$PWD/bot_ed25519,target=/etc/bot/bot_ed25519,readonly" \
+  --mount type=bind,source="$PWD/bot_ed25519.pub,target=/etc/bot/bot_ed25519.pub,readonly" \
   axgn/systembolaget-api-bot run --ssh-key /etc/bot/bot_ed25519 --log debug
 ```
 
@@ -43,11 +41,10 @@ Note that the user `bot` within the container will have to have read access to t
 
 [Quickstart](#quickstart)<br/>
 [Examples](#examples)<br/>
-[Use cases](#usecases)<br/>
+[Use cases](#use-cases)<br/>
 [Contributing](#contributing)
 
 ## Examples
-<a name="examples"></a>
 
 Example of an assortment item from `data/assortment.json`:
 
@@ -255,13 +252,11 @@ Example of a store item from `data/stores.json`:
 ```
 
 ## Use cases
-<a name="usecases"></a>
 
 The utility can be used to automatically grab the latest available data from Systembolaget. The data can be used to create
 interesting statistical charts, archives and more. Note however that data derived from the platform should not be used
 in a way that goes against [Systembolaget's mission](https://www.omsystembolaget.se/english/systembolaget-explained/).
 
 ## Contributing
-<a name="contributing"></a>
 
 Any help with the project is more than welcome. Although this is largely a mirror of Systembolaget's data, any corrections to it or the bot is welcome.
