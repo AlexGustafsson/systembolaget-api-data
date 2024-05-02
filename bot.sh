@@ -46,8 +46,9 @@ function log_debug {
 }
 
 function git {
-  log_debug "Executing git command: GIT_SSH_COMMAND=\"ssh -i $ssh_key\" command git $*"
-  GIT_SSH_COMMAND="ssh -i $ssh_key" command git "$@"
+  echo "$@"
+  log_debug "Executing git command: GIT_SSH_COMMAND=\"ssh -i $ssh_key -o IdentitiesOnly=yes\" git $*"
+  GIT_SSH_COMMAND="ssh -i $ssh_key -o IdentitiesOnly=yes" command git "$@"
 }
 
 # Setup
@@ -66,54 +67,54 @@ function setup {
 
   # Download the latest binary available
   case $(uname) in
-    "Darwin")
-      case $(uname -a) in
-      *"x86_64"*)
-        log_debug "Downloading Darwin x86_64 build"
-        curl -sOL "$binary_repository/releases/download/$latest_tag/darwin_amd64.tgz"
-        log_debug "Downloaded build, unzipping"
-        tar -xf darwin_amd64.tgz
-        log_debug "Unzipped build, removing archive"
-        mv build/darwin_amd64 systembolaget
-        rm -r build darwin_amd64.tgz
-        ;;
-      *"arm"*)
-        log_debug "Downloading Darwin arm build"
-        curl -sOL "$binary_repository/releases/download/$latest_tag/darwin_arm.tgz"
-        log_debug "Downloaded build, unzipping"
-        tar -xf darwin_arm64.tgz
-        log_debug "Unzipped build, removing archive"
-        mv build/darwin_arm64 systembolaget
-        rm -r build darwin_arm64.tgz
-        ;;
-      esac
+  "Darwin")
+    case $(uname -a) in
+    *"x86_64"*)
+      log_debug "Downloading Darwin x86_64 build"
+      curl -sOL "$binary_repository/releases/download/$latest_tag/darwin_amd64.zip"
+      log_debug "Downloaded build, unzipping"
+      unzip darwin_amd64.zip
+      log_debug "Unzipped build, removing archive"
+      mv build/darwin_amd64 systembolaget
+      rm -r build darwin_amd64.zip
       ;;
-    "Linux")
-      case $(uname -a) in
-      *"x86_64"*)
-        log_debug "Downloading Linux x86_64 build"
-        curl -sOL "$binary_repository/releases/download/$latest_tag/linux_amd64.tgz"
-        log_debug "Downloaded build, unzipping"
-        tar -xf linux_amd64.tgz
-        log_debug "Unzipped build, removing archive"
-        mv build/linux_amd64 systembolaget
-        rm -r build linux_amd64.tgz
-        ;;
-      *"arm"*)
-        log_debug "Downloading Linux arm build"
-        curl -sOL "$binary_repository/releases/download/$latest_tag/linux_arm.tgz"
-        log_debug "Downloaded build, unzipping"
-        tar -xf linux_arm64.tgz
-        log_debug "Unzipped build, removing archive"
-        mv build/linux_arm64 systembolaget
-        rm -r build linux_arm64.tgz
-        ;;
-      esac
+    *"arm"*)
+      log_debug "Downloading Darwin arm build"
+      curl -sOL "$binary_repository/releases/download/$latest_tag/darwin_arm64.zip"
+      log_debug "Downloaded build, unzipping"
+      unzip darwin_arm64.zip
+      log_debug "Unzipped build, removing archive"
+      mv build/darwin_arm64 systembolaget
+      rm -r build darwin_arm64.zip
       ;;
+    esac
+    ;;
+  "Linux")
+    case $(uname -a) in
+    *"x86_64"*)
+      log_debug "Downloading Linux x86_64 build"
+      curl -sOL "$binary_repository/releases/download/$latest_tag/linux_amd64.tgz"
+      log_debug "Downloaded build, unzipping"
+      tar -xzf linux_amd64.tgz
+      log_debug "Unzipped build, removing archive"
+      mv build/linux_amd64 systembolaget
+      rm -r build linux_amd64.tgz
+      ;;
+    *"arm"*)
+      log_debug "Downloading Linux arm build"
+      curl -sOL "$binary_repository/releases/download/$latest_tag/linux_arm.tgz"
+      log_debug "Downloaded build, unzipping"
+      tar -xzf linux_arm64.tgz
+      log_debug "Unzipped build, removing archive"
+      mv build/linux_arm64 systembolaget
+      rm -r build linux_arm64.tgz
+      ;;
+    esac
+    ;;
   esac
 
   # Clone the repository to push to
-  log_debug "Cloning repository"
+  log_debug "Cloning $repository"
   git clone --depth=1 "$repository" repository
   if [[ ! $? -eq 0 ]]; then
     log_error "Unable to clone repository: $git_output"
@@ -163,7 +164,7 @@ function run {
   log_debug "Commiting to repository as $bot_name"
   (cd "./repository" && git add .)
   (cd "./repository" && GIT_COMMITTER_NAME="$bot_name" GIT_COMMITTER_EMAIL="" git commit --author="$bot_name <>" -m "$commit_message" 2>&1)
-  if [[ "$?" -eq 0 ]]; then
+  if [[ $? -eq 0 ]]; then
     log_info "Commited to repository"
 
     # Push
@@ -194,7 +195,7 @@ function print_help {
 # Cleanup after the bot
 function cleanup {
   log_debug "Cleaning up directory"
-  rm -rf "output" "repository" &> /dev/null
+  rm -rf "output" "repository" &>/dev/null
   log_debug "Cleanup done"
 }
 
@@ -202,50 +203,51 @@ command="print_help"
 help=false
 while [ "$1" != "" ]; do
   case $1 in
-    "--help"|"-h")
-      help=true
+  "--help" | "-h")
+    help=true
+    ;;
+  "cleanup")
+    command="cleanup"
+    ;;
+  "setup")
+    command="setup"
+    ;;
+  "run")
+    command="run"
+    ;;
+  "--repository")
+    shift
+    repository=$1
+    ;;
+  "--binary-repository")
+    shift
+    binary_repository=$1
+    ;;
+  "--binary")
+    shift
+    binary_name=$1
+    ;;
+  "--ssh-key")
+    shift
+    ssh_key="$1"
+    ;;
+  "--log")
+    shift
+    case $1 in
+    "error")
+      log_level=0
       ;;
-    "cleanup")
-      command="cleanup"
+    "warn")
+      log_level=1
       ;;
-    "setup")
-      command="setup"
+    "info")
+      log_level=2
       ;;
-    "run")
-      command="run"
+    "debug")
+      log_level=3
       ;;
-    "--repository")
-      shift
-      repository=$1
-      ;;
-    "--binary-repository")
-      shift
-      binary_repository=$1
-      ;;
-    "--binary")
-      shift
-      binary_name=$1
-      ;;
-    "--ssh-key")
-      shift
-      ssh_key="$1"
-      ;;
-    "--log")
-      shift
-      case $1 in
-        "error")
-          log_level=0
-          ;;
-        "warn")
-          log_level=1
-          ;;
-        "info")
-          log_level=2
-          ;;
-        "debug")
-          log_level=3
-          ;;
-      esac
+    esac
+    ;;
   esac
   shift
 done
