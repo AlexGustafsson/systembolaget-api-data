@@ -156,7 +156,7 @@ function run {
   # Run binary
   log_info "Executing $binary_name"
   # Download
-  "./$binary_name" --verbose assortment --limit 25000 --page-delay 2s --output repository/data/assortment.json
+  "./$binary_name" --verbose assortment --page-delay 2s --output repository/data/assortment.json
   "./$binary_name" --verbose stores --output repository/data/stores.json
   log_debug "Download done"
 
